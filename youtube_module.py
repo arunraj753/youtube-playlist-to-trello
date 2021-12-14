@@ -32,7 +32,8 @@ class YoutubeModule:
             print("Playlist Title : ", playlist_title)
             return playlist_title
         except Exception as e:
-            print("An error occured in fetch_playlist_title() \n", e)
+            # print("An error occured in fetch_playlist_title() \n", e)
+            print("Invalid Playlist URL")
             exit(0)
 
     def fetch_playlist_videos(self, play_list_id):

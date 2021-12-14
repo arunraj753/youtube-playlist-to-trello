@@ -6,7 +6,6 @@ import time
 trello_api_key = os.environ.get("TRELLO_API_KEY")
 trello_api_token = os.environ.get("TRELLO_API_TOKEN")
 YOUTUBE_BOARD_NAME = "The Youtube Board"
-YOUTUBE_BOARD_NAME = "Getting Things Done - GTD"
 
 
 class TrelloModule:
@@ -63,15 +62,20 @@ class TrelloModule:
         response_json = response.json()
         return response_json
 
-    def create_card(self, list_id, card_name, desc):
+    def create_card(self, list_id, card_name, desc, url):
         endpoint = "1/cards"
         request_url = self.url + endpoint
         payload = self.payload.copy()
-        payload.update({"idList": list_id, "name": card_name, "desc": desc})
+        payload.update(
+            {"idList": list_id, "name": card_name, "desc": desc, "urlSource": url}
+        )
         response = requests.post(request_url, data=payload)
         self.validate_response_status(response)
         response_json = response.json()
-        print("New Trello Card created with title : ", card_name)
+        print(
+            f"New Trello Card created with title:{card_name} & id: {response_json['id']}"
+        )
+        return response_json["id"]
 
     def get_or_create_youtube_board(self):
         boards_json = self.get_user_boards()
@@ -79,7 +83,6 @@ class TrelloModule:
             if board["name"] == YOUTUBE_BOARD_NAME:
                 print("Youtube Board Found")
                 return board["id"]
-        exit(0)
         endpoint = "1/boards/"
         request_url = self.url + endpoint
 
@@ -91,5 +94,37 @@ class TrelloModule:
         board_id = response.json()["id"]
         return board_id
 
+    def create_attachment_on_card(self, card_id, attatchment_url, cover_status):
+        endpoint = f"1/cards/{card_id}/attachments"
+        request_url = self.url + endpoint
+        payload = self.payload.copy()
+        payload.update({"url": attatchment_url})
+        response = requests.post(request_url, data=payload)
+        self.validate_response_status(response)
+        print("Attachment created on the card")
 
-# 61b5b73439525b53b1517e05
+    def create_checklist_on_card(
+        self, card_id, playlist_video_ids, checklist_name="Checklist"
+    ):
+        endpoint = f"1/cards/{card_id}/checklists"
+        request_url = self.url + endpoint
+        payload = self.payload.copy()
+        payload.update({"name": checklist_name})
+        response = requests.post(request_url, data=payload)
+        self.validate_response_status(response)
+        checklist_id = response.json()["id"]
+        print("Checklist created with title : ", checklist_name)
+        print("Adding checklist items:-")
+        # Adding items to the created checklist
+        endpoint = f"1/checklists/{checklist_id}/checkItems"
+        request_url = self.url + endpoint
+        index = 0
+        for video_id in playlist_video_ids:
+            video_link = "https://www.youtube.com/watch?v=" + video_id
+            payload = self.payload.copy()
+            payload.update({"name": video_link})
+            response = requests.post(request_url, data=payload)
+            self.validate_response_status(response)
+
+            print("\t", video_link)
+        print(f"Added {len(playlist_video_ids)} items to checklist")
