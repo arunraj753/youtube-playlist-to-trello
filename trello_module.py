@@ -58,8 +58,6 @@ class TrelloModule:
     def get_cards_in_a_list(self, list_id):
         endpoint = f"1/lists/{list_id}/cards"
         request_url = self.url + endpoint
-        print(request_url)
-        print("Payload : ", self.payload)
         response = requests.get(request_url, data=self.payload)
         self.validate_response_status(response)
         response_json = response.json()
@@ -73,7 +71,7 @@ class TrelloModule:
         response = requests.post(request_url, data=payload)
         self.validate_response_status(response)
         response_json = response.json()
-        print(response_json)
+        print("New Trello Card created with title : ", card_name)
 
     def get_or_create_youtube_board(self):
         boards_json = self.get_user_boards()
