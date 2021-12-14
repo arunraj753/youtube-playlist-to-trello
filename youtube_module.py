@@ -10,13 +10,18 @@ class YoutubeModule:
     youtube = build("youtube", "v3", developerKey=youtube_api_key)
 
     def get_playlist_id(self, playlist_url):
-        youtube_url, play_list_id = playlist_url.split("&list=")
-        if youtube_url.startswith(
-            "https://www.youtube.com/watch?v="
-        ) and play_list_id.startswith("PL"):
-            play_list_id = play_list_id.split("&index")[0]
-            print("play_list_id : ", play_list_id)
-            return play_list_id
+        url_split = playlist_url.split("&list=")
+        if len(url_split) == 2:
+            youtube_url, play_list_id = playlist_url.split("&list=")
+            if youtube_url.startswith(
+                "https://www.youtube.com/watch?v="
+            ) and play_list_id.startswith("PL"):
+                play_list_id = play_list_id.split("&index")[0]
+                print("play_list_id : ", play_list_id)
+                return play_list_id
+            else:
+                print("Invalid playlist url")
+                exit(0)
         else:
             print("Invalid playlist url")
             exit(0)
