@@ -1,6 +1,5 @@
 from youtube_module import YoutubeModule
 from trello_module import TrelloModule
-import time
 
 yt = YoutubeModule()
 tr = TrelloModule()
@@ -13,15 +12,12 @@ if __name__ == "__main__":
     playlist_video_ids = yt.fetch_playlist_videos(play_list_id)
     playlist_video_details = yt.fetch_video_details(playlist_video_ids)
     print(f"Fetched {len(playlist_video_details)} video details")
-    index = 0
     # for video in playlist_video_details:
     #     print(video["snippet"]["title"])
-    #     print("https://www.youtube.com/watch?v=" + playlist_video_ids[index])
-    #     index += 1
+
     channel_title = playlist_video_details[0]["snippet"]["channelTitle"]
-    channel_thumbnails = playlist_video_details[0]["snippet"]["thumbnails"]
-    thumnbnail_url = channel_thumbnails["standard"]["url"]
-    print("Youtube video details fetching completed\n")
+    first_video_id = playlist_video_ids[0]
+    thumbnail_url = yt.get_video_thumbnail(first_video_id)
     print("Starting Trello Section")
 
     trello_youtube_board_id = tr.get_or_create_youtube_board()
@@ -29,7 +25,6 @@ if __name__ == "__main__":
     required_youtube_board_lists = ["Done", "Ongoing", "Playlist-Inbox"]
     # youtube_board_list_ids_dict = {"Playlist-Inbox": id_1, "Ongoing": id_2, "Done": id_3}
     youtube_board_list_ids_dict = {}
-    list_to_modify_dict = {}
     list_to_create_dict = {}
     trello_list_to_create = []
     for list_name in required_youtube_board_lists:
@@ -82,7 +77,7 @@ if __name__ == "__main__":
     created_card_id = tr.create_card(
         pl_inbox_list_id, trello_card_title, card_desc, playlist_url
     )
-    tr.create_attachment_on_card(created_card_id, thumnbnail_url, "true")
+    tr.create_attachment_on_card(created_card_id, thumbnail_url, "true")
     tr.create_checklist_on_card(
         created_card_id, playlist_video_ids, checklist_name="Videos List"
     )

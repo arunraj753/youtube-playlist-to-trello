@@ -12,7 +12,7 @@ class YoutubeModule:
     def get_playlist_id(self, playlist_url):
         url_split = playlist_url.split("&list=")
         if len(url_split) == 2:
-            youtube_url, play_list_id = playlist_url.split("&list=")
+            youtube_url, play_list_id = url_split
             if youtube_url.startswith(
                 "https://www.youtube.com/watch?v="
             ) and play_list_id.startswith("PL"):
@@ -76,6 +76,15 @@ class YoutubeModule:
                 print(f"Fetched {len(playlist_video_ids)} videos ids from the playlist")
                 break
         return playlist_video_ids
+
+    def get_video_thumbnail(self, video_id):
+        vid_request = self.youtube.videos().list(part="snippet", id=video_id)
+        vid_response = vid_request.execute()
+        channel_thumbnails = vid_response["items"][0]["snippet"]["thumbnails"][
+            "standard"
+        ]
+        thumbnail_url = channel_thumbnails["url"]
+        return thumbnail_url
 
     def fetch_video_details(self, playlist_video_ids):
         videos_count = len(playlist_video_ids)
