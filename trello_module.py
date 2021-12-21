@@ -98,7 +98,7 @@ class TrelloModule:
         endpoint = f"1/cards/{card_id}/attachments"
         request_url = self.url + endpoint
         payload = self.payload.copy()
-        payload.update({"url": attatchment_url})
+        payload.update({"url": attatchment_url, "setCover": cover_status})
         response = requests.post(request_url, data=payload)
         self.validate_response_status(response)
         print("Attachment created on the card")
